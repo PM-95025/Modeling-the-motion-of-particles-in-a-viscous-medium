@@ -1,10 +1,10 @@
 from numpy import pi, arange
-from tkinter import Tk, Entry, Button, Label
+from tkinter import Tk, Entry, Label, DoubleVar
 import tkinter
 import unittest
 
 
-def create_UI() -> tuple:
+def create_UI() -> tuple[float, ...]:
 	"""
 	Creates an UI of `Settings` window.
 
@@ -14,69 +14,55 @@ def create_UI() -> tuple:
 	window.title("Settings")
 	window.geometry('400x250')
 
-	Label(window, text='vₒ:', justify=tkinter.RIGHT, anchor='e', width=80, font=('Arial', 12)).place(x=10, y=5,
-																									 width=30,
-																									 height=20)
-	v0_ = tkinter.DoubleVar(window, value=0.0)
-	v0_entry = tkinter.Entry(window, width=40, textvariable=v0_)
-	v0_entry.focus()
-	v0_entry.place(x=50, y=5, width=40, height=20)
+	v0_ = DoubleVar(window, value=0.0)
+	R_ = DoubleVar(window, value=0.0)
+	ro_ = DoubleVar(window, value=0.0)
+	ro_fluid_ = DoubleVar(window, value=0.0)
+	mu_ = DoubleVar(window, value=0.0)
+	tmax_ = DoubleVar(window, value=0.0)
+	dt_ = DoubleVar(window, value=0.0)
+	dv_ = DoubleVar(window, value=0.0)
 
-	Label(window, text='R:', justify=tkinter.RIGHT, anchor='e', width=80, font=('Arial', 12)).place(x=10, y=30,
-																									width=30, height=20)
-	R_ = tkinter.DoubleVar(window, value=0.0)
-	R_entry = tkinter.Entry(window, width=40, textvariable=R_)
-	R_entry.place(x=50, y=30, width=40, height=20)
+	font = ('Courier', 12)
+	height = 20
+	entry_width = 40
+	label_width = 60
 
-	Label(window, text='ρ:', justify=tkinter.RIGHT, anchor='e', width=80, font=('Arial', 12)).place(x=10, y=55,
-																									width=30, height=20)
-	ro_ = tkinter.DoubleVar(window, value=0.0)
-	ro_entry = tkinter.Entry(window, width=40, textvariable=ro_)
-	ro_entry.place(x=50, y=55, width=40, height=20)
+	labels = ['vₒ:', 'R:', 'ρ:', 'ρ_f:', 'μ:', 'tmax:', 'Δt:', 'Δv:']
+	varnames = ['v0_', 'R_', 'ro_', 'ro_fluid_', 'mu_', 'tmax_', 'dt_', 'dv_']
+	units = ['m/s', 'm', 'kg/m³', 'kg/m³', '', 's', 's', 'm/s']
+	values = 8
 
-	Label(window, text='ρ_f:', justify=tkinter.RIGHT, anchor='e', width=80, font=('Arial', 12)).place(x=10, y=80,
-																									  width=30,
-																									  height=20)
-	ro_fluid_ = tkinter.DoubleVar(window, value=0.0)
-	ro_fluid_entry = tkinter.Entry(window, width=40, textvariable=ro_fluid_)
-	ro_fluid_entry.place(x=50, y=80, width=40, height=20)
+	def create_Labels():
+		for i in range(values):
+			Label(window, text=labels[i], justify=tkinter.RIGHT, anchor='e', width=label_width, font=font).place(x=10, y=5+25*i, width=label_width, height=height)
+		for i in range(values):
+			Label(window, text=units[i], justify=tkinter.LEFT, anchor='w', width=label_width, font=font).place(x=130, y=5+25*i, width=label_width, height=height)
+		pass
 
-	Label(window, text='μ:', justify=tkinter.RIGHT, anchor='e', width=80, font=('Arial', 12)).place(x=10, y=105,
-																									width=30, height=20)
-	mu_ = tkinter.DoubleVar(window, value=0.0)
-	mu_entry = tkinter.Entry(window, width=40, textvariable=mu_)
-	mu_entry.place(x=50, y=105, width=40, height=20)
+	def create_Entries(R_, height, ro_, ro_fluid_, mu_, tmax_, dt_, dv_):
+		v0_entry = tkinter.Entry(window, width=entry_width, textvariable=v0_)
+		v0_entry.focus()
+		v0_entry.place(x=80, y=5, width=entry_width, height=20)
 
-	Label(window, text='tmax:', justify=tkinter.RIGHT, anchor='e', width=80, font=('Arial', 12)).place(x=10, y=130,
-																									   width=30,
-																									   height=20)
-	tmax_ = tkinter.DoubleVar(window, value=0.0)
-	tmax_entry = tkinter.Entry(window, width=40, textvariable=tmax_)
-	tmax_entry.place(x=50, y=130, width=40, height=20)
+		for i in range(1, values):
+			exec(f'tkinter.Entry(window, width=entry_width, textvariable={varnames[i]}).place(x=80, y=30+25*(i-1), width=entry_width, height=height)')
 
-	Label(window, text='Δt:', justify=tkinter.RIGHT, anchor='e', width=80, font=('Arial', 12)).place(x=10, y=155,
-																									 width=30,
-																									 height=20)
-	dt_ = tkinter.DoubleVar(window, value=0.0)
-	dt_entry = tkinter.Entry(window, width=40, textvariable=dt_)
-	dt_entry.place(x=50, y=155, width=40, height=20)
+	def save(root: Tk):
+		"""
+		Closes the `root` window.
+		"""
+		root.destroy()
 
-	Label(window, text='Δv:', justify=tkinter.RIGHT, anchor='e', width=80, font=('Arial', 12)).place(x=10, y=180,
-																									 width=30,
-																									 height=20)
-	dv_ = tkinter.DoubleVar(window, value=0.0)
-	dv_entry = tkinter.Entry(window, width=40, textvariable=dv_)
-	dv_entry.place(x=50, y=180, width=40, height=20)
+	create_Labels()
+	create_Entries(R_, height, ro_, ro_fluid_, mu_, tmax_, dt_, dv_)
 
-	def save():
-		window.destroy()
-
-	buttonOk = tkinter.Button(window, text='Save', command=save)
-	buttonOk.place(x=105, y=5, width=100, height=200)
+	buttonOk = tkinter.Button(window, text='Save', command=lambda: save(window))
+	buttonOk.place(x=195, y=5, width=100, height=200)
 
 	window.mainloop()
 
-	return v0_.get(), R_.get(), ro_.get(), ro_fluid_.get(), mu_.get(), tmax_.get(), dt_.get(), dv_.get()
+	return tuple([i.get() for i in (v0_, R_, ro_, ro_fluid_, mu_, tmax_, dt_, dv_)])
 
 
 def FStocks(R: float, v: float, mu: float) -> float:
@@ -120,6 +106,7 @@ tmax: float = 1e5
 dt: float = 1e-3
 v_eps = 1e-9
 '''
+
 v0, R, ro, ro_fluid, mu, tmax, dt, v_eps = create_UI()
 
 v: float = v0
@@ -141,7 +128,7 @@ for t in arange(t0 - dt, tmax, dt):
 	pass
 
 '''
-while abs(v_expected - v) > v_eps:
+while (abs(v_expected - v) > v_eps) and t < tmax:
 	Fcurr: float = FTotal(R, ro, ro_fluid, v, mu, g)
 	a = Fcurr / m
 	v += dt * a / 2
